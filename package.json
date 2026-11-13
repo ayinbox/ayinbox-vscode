@@ -1,0 +1,57 @@
+{
+  "name": "ayinbox",
+  "displayName": "AY Inbox",
+  "description": "Adds the AY Inbox MCP server to VS Code, so its cold email tools appear in GitHub Copilot agent mode.",
+  "version": "0.1.0",
+  "publisher": "ayinbox",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "homepage": "https://docs.ayinbox.com/api/mcp/",
+  "repository": { "type": "git", "url": "https://github.com/ayinbox/ayinbox-vscode.git" },
+  "bugs": { "email": "team@ayinbox.com" },
+  "engines": { "vscode": "^1.101.0" },
+  "categories": ["AI", "Chat", "Other"],
+  "keywords": ["mcp", "copilot", "cold email", "ayinbox", "agent"],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      { "id": "ayinbox.mcp", "label": "AY Inbox" }
+    ],
+    "commands": [
+      { "command": "ayinbox.useApiKey", "title": "Use an API key", "category": "AY Inbox" },
+      { "command": "ayinbox.useOAuth", "title": "Sign in with OAuth instead", "category": "AY Inbox" },
+      { "command": "ayinbox.openDocs", "title": "Open docs", "category": "AY Inbox" }
+    ],
+    "configuration": {
+      "title": "AY Inbox",
+      "properties": {
+        "ayinbox.serverUrl": {
+          "type": "string",
+          "default": "https://api.ayinbox.com/v1/mcp",
+          "markdownDescription": "URL of the AY Inbox MCP server. Must be `https`. Add `?toolsets=inbox,campaigns` to narrow the tool list.",
+          "scope": "application"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --target=node20 --external:vscode --outfile=dist/extension.js --minify",
+    "vscode:prepublish": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src test",
+    "test": "node --test test/*.test.ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "1.101.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.25.0",
+    "eslint": "^9.0.0",
+    "ovsx": "^0.10.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}

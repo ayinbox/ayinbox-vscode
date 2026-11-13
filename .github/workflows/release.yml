@@ -1,0 +1,33 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck && npm run lint && npm test
+      - name: Check the tag matches package.json
+        run: test "v$(node -p 'require("./package.json").version')" = "${GITHUB_REF_NAME}"
+      - run: npx vsce package --out ayinbox.vsix
+      - name: Publish to the Visual Studio Marketplace
+        run: npx vsce publish --packagePath ayinbox.vsix
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish to Open VSX
+        run: npx ovsx publish ayinbox.vsix
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+      - name: Attach the package to the GitHub release
+        run: gh release create "$GITHUB_REF_NAME" ayinbox.vsix --title "$GITHUB_REF_NAME" --notes "See CHANGELOG.md."
+        env:
+          GH_TOKEN: ${{ github.token }}
